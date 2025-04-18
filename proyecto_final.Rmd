@@ -11,8 +11,51 @@ output: html_document
 + Integrante 3. Rol: Colaborador 2
 
 ```{r}
+setwd("/Users/bryantcanseco/Desktop/UNAM/Diplomados/Ciencia de Datos- UNAM/diplo-modulo3-equipo-11")
+
+# Cargamos las librerías necesarias para conectarnos y manipular la base de datos
 library(DBI)
 library(dbplyr)
 library(RSQLite)
 
-conn <- DBI::dbConnect(RSQLite::SQLite(), "baseball.db")
+# Establecemos la conexión con la base de datos local baseball.db
+conn <- dbConnect(RSQLite::SQLite(), "baseball.db")
+```
+
+
+```{r}
+# Obtenemos y mostramos las tablas contenidas en la base de datos
+tablas <- dbListTables(conn)
+length(tablas)  # Número total de tablas en la base
+tablas          # Nombres de cada tabla
+```
+
+
+
+
+```{r objetos_tablas}
+# Leemos cada tabla de la base de datos y creamos un objeto en R con el mismo nombre
+for (tabla in tablas) {
+  assign(tabla, dbReadTable(conn, tabla))
+}
+
+# Inspeccionamos la estructura de la tabla 'nombres'
+head(nombres)
+str(nombres)
+```
+
+```{r resumen-tablas, message=FALSE, warning=FALSE}
+# Creamos una tabla resumen con el número de filas por cada tabla
+resumen_tablas <- tibble::tibble(
+  nombre_tabla = tablas,
+  num_filas = sapply(tablas, function(t) nrow(get(t)))
+)
+
+# Mostramos la tabla 
+knitr::kable(resumen_tablas, caption = "Resumen de tablas en la base de datos 'baseball.db'")
+```
+
+
+
+
+
